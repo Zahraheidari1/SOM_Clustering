@@ -4,7 +4,7 @@ class SOM:
     def __init__(self, input_dim, map_size):
         self.input_dim = input_dim
         self.map_size = map_size
-        self.weights = np.random.rand(map_size[0], map_size[1], input_dim)
+        self.weights = np.random.rand(*map_size, input_dim)
 
     def train(self, data, num_epochs):
         for epoch in range(num_epochs):
@@ -21,11 +21,11 @@ class SOM:
 
     def find_bmu(self, x):
         # Compute the Euclidean distance between x and each neuron's weights
-        dists = np.sum((self.weights - x) ** 2, axis=2)
+        dists = np.sum((self.weights - x) ** 2, axis=-1)
 
         # Find the index of the neuron with the smallest distance to x
         bmu_idx = np.unravel_index(np.argmin(dists), dists.shape)
-        bmu = self.weights[bmu_idx[0], bmu_idx[1]]
+        bmu = self.weights[bmu_idx]
 
         return bmu, bmu_idx
 
@@ -35,13 +35,16 @@ class SOM:
         r = self.map_size[0] / 2.0 * lr
 
         # Compute the distance between each neuron and the BMU
-        dists = np.sqrt(np.sum((np.indices(self.map_size).T - np.array(bmu_idx)) ** 2, axis=1))
+        indices = np.indices(self.map_size).T
+        dists = np.sqrt(np.sum((indices - np.array(bmu_idx)) ** 2, axis=-1))
 
         # Compute the neighborhood function
         h = np.exp(-(dists ** 2) / (2 * r ** 2))
 
-        # Update the weights of the BMU and its neighbors
-        delta = lr * h[:, np.newaxis] * (x - self.weights)
+        # Compute the delta for updating the weights
+        delta = lr * h[..., np.newaxis] * (x - self.weights)
+
+        # Update the weights using element-wise addition
         self.weights += delta
 
     def cluster(self, data):

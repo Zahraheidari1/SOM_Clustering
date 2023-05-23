@@ -3,6 +3,7 @@ from SOM import SOM
 import pandas as pd
 from sklearn.feature_extraction.text import TfidfVectorizer
 from TFIDF import tf_idf
+from sklearn.decomposition import PCA
 
 map_size = (10, 10)
 df = pd.read_excel('Data.xlsx', sheet_name='Sheet') 
@@ -12,6 +13,10 @@ docs_test=input()
 docs=[tf_idf(doc) for doc in docs]
 vectorizer = TfidfVectorizer()
 tfidf_vectors = vectorizer.fit_transform(docs).toarray()
+
+docs_vector=[]
+#pca = PCA(n_components=2)
+#docs_vector = pca.fit_transform(docs)
 # Create an instance of the SOM class
 input_dim = tfidf_vectors.shape[1]
 som = SOM(input_dim, map_size)
