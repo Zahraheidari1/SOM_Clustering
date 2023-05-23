@@ -1,0 +1,10 @@
+ELI5 quote about Marxism from Chang's Economics: A User's Guide?
+ I am currently reading Ha-Joon Chang's book Economics: The User's Guide. I am on the section of the book where he describes, compares and contrasts the philosophies of different schools of economics. I am currently on the section regarding Marxism.
+
+In it, he has this bit, that I am wondering if someone could help me understand better:
+
+"Marx did not believe that workers could start a revolution and topple capitalism at will. The time had to be ripe. This would only come when capitalism has developed sufficiently, leading to a heightened contradiction between the technological requirements of the system (forces of production) and its institutional set-up (relations of production).
+
+With the continuous development of technologies, spurred by the need on the part of capitalists to invest and innovate in order to survive the unrelenting competition, the division of labour becomes increasingly more 'social', making capitalist firms more dependent on each other as suppliers and buyers. This makes coordination of activities among those related firms increasingly more necessary, but the persistence of private ownership of the means of production makes such coordination very difficult, if not totally impossible. The result is increasing contradiction in the system, finally leading to its collapse. Capitalism would be replaced by socialism, in which the central planning authority fully coordinates the activities of all the related enterprises, now collectively owned by all workers."
+
+Ok, in trying to understand this, this is where I am: As capitalism develops, the division of labour continues and continues until you have many, many (too many) different divisions of labour. All firms are competing over the same finite resources, and it basically leads to a race to the bottom for many labourers as the different firms they work for have to "give up more" to win (lower salaries, less protections, more exploitation). What the system needs is a central coordinating body. Am I close?

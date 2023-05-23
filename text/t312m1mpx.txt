@@ -1,0 +1,8 @@
+For some reason, the LTV and STV debate just seems like a major, MAJOR category mistake to me.
+When I spoke to economists, none of them seemed to be familiar with the notion of “SNLT”, and they discredited the LTV with the STV on the basis that commodities are solely “valued”, not “valuable”.
+
+I think this is the fundamental distinction to be made - the way I see it, Ricardo and Marx speak of commodities it terms of them being *valuable*, whereas STV focuses on how *valued* those commodities are.
+
+Moreover, SNLT is largely a product of *valued* dynamics - namely, “DUDE, YOU GOTTA N O T WORK SLOWER THAN THE OTHER COMPANIES BECAUSE DUDES WANT TO BUY THIS SHIT, SO, THEY’LL END UP BUYING IT FROM THEM, AAAAA” - in other words *valuedness* shapes *valuableness*, so don’t STV and LTV not actually end up contradicting each other at all?
+
+In essence, STV seems solely to pertain to use-value, *valuedness*, whereas exchange-value pertains to *valuableness*, and it seems that use-value lays the blanket for exchange-value to rest on (there is no “no use-value”, much to Smith’s dismay, because diamonds are purchased solely insofar as they are *valued* as useful - namely, useful to us as *that which we assume is objet a*).
