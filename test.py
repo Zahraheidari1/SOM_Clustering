@@ -6,7 +6,7 @@ import hazm
 import sys
 from openpyxl import load_workbook
 import xlwings as xw
-from  functions import text_similarity
+from  text_similarity import text_similarity
 
 df = pd.read_excel('Data.xlsx', sheet_name='Sheet') 
 docs=df['متن'].to_list()
