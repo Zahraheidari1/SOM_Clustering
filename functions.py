@@ -1,31 +1,28 @@
-from sklearn.metrics.pairwise import cosine_similarity
 import hazm
 from hazm.utils import stopwords_list
-from sklearn.feature_extraction.text import TfidfVectorizer
+from hazm import WordTokenizer, Lemmatizer
 
-def text_similarity(text1, text2):
-    # Tokenize and lemmatize the texts
-    tokenizer = hazm.WordTokenizer()
-    tokens1 = tokenizer.tokenize(text1)
-    tokens2 = tokenizer.tokenize(text2)
-    lemmatizer = hazm.Lemmatizer()
-    tokens1 = [lemmatizer.lemmatize(token) for token in tokens1]
-    tokens2 = [lemmatizer.lemmatize(token) for token in tokens2]
 
-    # Remove stopwords
+def preprocess_documents(documents):
+    tokenizer = WordTokenizer()
+    lemmatizer = Lemmatizer()
     stop_words = stopwords_list()
-    tokens1 = [token for token in tokens1 if token not in stop_words]
-    tokens2 = [token for token in tokens2 if token not in stop_words]
+    preprocessed_docs = []
 
-    # Convert the token lists back to strings
-    text1_clean = ' '.join(tokens1)
-    text2_clean = ' '.join(tokens2)
+    batch_size = 100  # Number of documents to process in each batch
 
-    # Create the TF-IDF vectors
-    vectorizer = TfidfVectorizer()
-    vector1 = vectorizer.fit_transform([text1_clean, text2_clean])
+    for i in range(0, len(documents), batch_size):
+        batch_docs = documents[i:i+batch_size]
 
-    # Calculate the cosine similarity
-    similarity = cosine_similarity(vector1)[0][1]
+        # Tokenize, lemmatize, and remove stopwords for each document in the batch
+        batch_tokens = []
+        for doc in batch_docs:
+            tokens = tokenizer.tokenize(doc)
+            tokens = [lemmatizer.lemmatize(token) for token in tokens]
+            tokens = [token for token in tokens if token not in stop_words]
+            text_clean = ' '.join(tokens)
+            batch_tokens.append(text_clean)
 
-    return similarity
+        preprocessed_docs.extend(batch_tokens)
+
+    return preprocessed_docs
