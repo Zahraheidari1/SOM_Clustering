@@ -1,8 +1,12 @@
 import hazm
+import pandas as pd
 from hazm.utils import stopwords_list
 from hazm import WordTokenizer, Lemmatizer
 from sklearn.metrics import accuracy_score
-
+from sklearn.feature_extraction.text import TfidfVectorizer
+from SOM import SOM
+from sklearn.decomposition import PCA
+from sklearn.model_selection import train_test_split
 def preprocess_documents(documents):
     tokenizer = WordTokenizer()
     lemmatizer = Lemmatizer()
@@ -27,21 +31,13 @@ def preprocess_documents(documents):
 
     return preprocessed_docs
 
-import numpy as np
-from SOM import SOM
-import pandas as pd
-from sklearn.feature_extraction.text import TfidfVectorizer
-from functions import preprocess_documents
-from sklearn.decomposition import PCA
-from sklearn.model_selection import train_test_split
-
 def generate_cluster_labels(input_file):
     # Read the Excel file and extract the documents
     df = pd.read_excel(input_file, sheet_name='Sheet') 
     docs = df['متن'].to_list()
 
     # Split the data into training and test sets
-    docs_train, docs_test, labels_train, labels_test = train_test_split(docs, labels, test_size=0.2, random_state=42)
+    docs_train, docs_test = train_test_split(docs, test_size=0.2, random_state=42)
 
     # Preprocess the training and test documents
     docs_train = preprocess_documents(docs_train)
