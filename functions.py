@@ -1,4 +1,4 @@
-import hazm
+import numpy as np
 import pandas as pd
 from hazm.utils import stopwords_list
 from hazm import WordTokenizer, Lemmatizer
@@ -7,6 +7,8 @@ from sklearn.feature_extraction.text import TfidfVectorizer
 from SOM import SOM
 from sklearn.decomposition import PCA
 from sklearn.model_selection import train_test_split
+from sklearn.metrics.pairwise import cosine_similarity
+
 def preprocess_documents(documents):
     tokenizer = WordTokenizer()
     lemmatizer = Lemmatizer()
@@ -31,11 +33,12 @@ def preprocess_documents(documents):
 
     return preprocessed_docs
 
-def generate_cluster_labels(input_file):
+def generate_cluster_labels(filename,num_clusters):
     # Read the Excel file and extract the documents
-    df = pd.read_excel(input_file, sheet_name='Sheet') 
+    df = pd.read_excel(filename, sheet_name='Sheet')
     docs = df['متن'].to_list()
-
+    title = df['عنوان'].drop_duplicates().tolist()
+    
     # Split the data into training and test sets
     docs_train, docs_test = train_test_split(docs, test_size=0.2, random_state=42)
 
@@ -52,13 +55,15 @@ def generate_cluster_labels(input_file):
     docs_vector = pca.fit_transform(tfidf_vectors)
 
     # Create SOM instance
-    map_size = (10, 10)
+    map_size = (10,10)
     input_dim = docs_vector.shape[1]
-    som = SOM(input_dim, map_size)
+    som = SOM(input_dim, map_size,num_clusters)
 
     # Train the SOM on the document vectors
     num_epochs = 10
     som.train(docs_vector, num_epochs)
+
+    u_matrix = som.get_u_matrix()
 
     # Preprocess the test documents
     docs_test = preprocess_documents(docs_test)
@@ -66,18 +71,20 @@ def generate_cluster_labels(input_file):
     # Convert test documents to TF-IDF vectors
     test_tfidf_vectors = vectorizer.transform(docs_test).toarray()
     test_docs_vector = pca.transform(test_tfidf_vectors)
+    similarity = cosine_similarity(test_docs_vector)[0][1]
 
     # Cluster the test documents using the trained SOM
     cluster_labels = som.cluster(test_docs_vector)
 
     # Write the cluster labels to the output text file
-    output_file = "output.txt"
-    with open(output_file, "w") as file:
+    output_file_path = "output.txt"
+    with open(output_file_path, "w") as file:
         for label in cluster_labels:
             file.write(str(label) + "\n")
 
-    print("Output has been saved to", output_file)
+    print("Output has been saved to", output_file_path)
 
-    return output_file
+    # Save test_docs_vector to a text file
+    np.savetxt("test_docs_vector.txt", test_docs_vector)
 
-
+    return  test_docs_vector,  cluster_labels ,u_matrix

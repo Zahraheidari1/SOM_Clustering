@@ -1,10 +1,12 @@
 import numpy as np
 
 class SOM:
-    def __init__(self, input_dim, map_size):
+    def __init__(self, input_dim, map_size,num_clusters):
         self.input_dim = input_dim
         self.map_size = map_size
         self.weights = np.random.rand(*map_size, input_dim)
+        self.umatrix = None
+        self.num_clusters=num_clusters
 
     def train(self, data, num_epochs):
         for epoch in range(num_epochs):
@@ -18,6 +20,9 @@ class SOM:
 
                 # Update the weights of the BMU and its neighbors
                 self.update_weights(x, bmu, bmu_idx, epoch, num_epochs)
+
+        # Calculate U-Matrix after training
+        self.calculate_umatrix()
 
     def find_bmu(self, x):
         # Compute the Euclidean distance between x and each neuron's weights
@@ -47,13 +52,58 @@ class SOM:
         # Update the weights using element-wise addition
         self.weights += delta
 
+    def calculate_umatrix(self):
+        # Initialize the U-Matrix array with zeros
+        umatrix = np.zeros((self.map_size[0] * 2 - 1, self.map_size[1] * 2 - 1))
+
+        # Iterate over each neuron in the SOM
+        for i in range(self.map_size[0]):
+            for j in range(self.map_size[1]):
+                # Get the current neuron's weights
+                current_weights = self.weights[i, j]
+
+                # Calculate the U-Matrix value for the current neuron
+                if i > 0:
+                    # Calculate the U-Matrix value for the left neighbor
+                    left_weights = self.weights[i - 1, j]
+                    umatrix[2 * i - 1, 2 * j] = np.linalg.norm(current_weights - left_weights)
+
+                if i < self.map_size[0] - 1:
+                    # Calculate the U-Matrix value for the right neighbor
+                    right_weights = self.weights[i + 1, j]
+                    umatrix[2 * i + 1, 2 * j] = np.linalg.norm(current_weights - right_weights)
+
+                if j > 0:
+                    # Calculate the U-Matrix value for the top neighbor
+                    top_weights = self.weights[i, j - 1]
+                    umatrix[2 * i, 2 * j - 1] = np.linalg.norm(current_weights - top_weights)
+
+                if j < self.map_size[1] - 1:
+                    # Calculate the U-Matrix value for the bottom neighbor
+                    bottom_weights = self.weights[i, j + 1]
+                    umatrix[2 * i, 2 * j + 1] = np.linalg.norm(current_weights - bottom_weights)
+
+        self.umatrix = umatrix
+        
+    def get_u_matrix(self):
+        return self.umatrix    
+
     def cluster(self, data):
         labels = []
         for x in data:
             # Find the best matching unit (BMU) for the data point
-            bmu, bmu_idx = self.find_bmu(x)
+                bmu, bmu_idx = self.find_bmu(x)
 
             # Assign the data point to the cluster of the BMU
-            labels.append(bmu_idx)
+                labels.append(bmu_idx)
+        ''' labels = []
+        num_clusters = 12  # Number of clusters
+    
+        for i, x in enumerate(data):
+            cluster_label = i % num_clusters  # Assign a cluster label in a cyclic manner
+            labels.append(cluster_label)
+    
+          '''
 
-        return np.array(labels)
+        return labels
+
