@@ -2,7 +2,7 @@ import random
 import pandas as pd
 import numpy as np
 from bokeh.layouts import row
-from functions import generate_cluster_labels
+from mini import generate_cluster_labels
 from bokeh.plotting import curdoc, figure, show
 from bokeh.models import FileInput, Button, Slider, LabelSet, ColumnDataSource, HoverTool
 from SOM import SOM

@@ -90,20 +90,21 @@ class SOM:
 
     def cluster(self, data):
         labels = []
+    
         for x in data:
             # Find the best matching unit (BMU) for the data point
                 bmu, bmu_idx = self.find_bmu(x)
 
             # Assign the data point to the cluster of the BMU
                 labels.append(bmu_idx)
-        ''' labels = []
+        '''labels = []
         num_clusters = 12  # Number of clusters
     
         for i, x in enumerate(data):
-            cluster_label = i % num_clusters  # Assign a cluster label in a cyclic manner
+            cluster_label = i % num_clusters +1 # Assign a cluster label in a cyclic manner
             labels.append(cluster_label)
     
-          '''
+        '''
 
         return labels
 
