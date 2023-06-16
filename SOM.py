@@ -1,12 +1,11 @@
 import numpy as np
 
 class SOM:
-    def __init__(self, input_dim, map_size,num_clusters):
+    def __init__(self, input_dim, map_size):
         self.input_dim = input_dim
         self.map_size = map_size
         self.weights = np.random.rand(*map_size, input_dim)
         self.umatrix = None
-        self.num_clusters=num_clusters
 
     def train(self, data, num_epochs):
         for epoch in range(num_epochs):
@@ -38,23 +37,23 @@ class SOM:
         # Compute the learning rate and neighborhood radius
         lr = 1.0 - (epoch / float(num_epochs))
         r = self.map_size[0] / 2.0 * lr
-
+    
         # Compute the distance between each neuron and the BMU
-        indices = np.indices(self.map_size).T
-        dists = np.sqrt(np.sum((indices - np.array(bmu_idx)) ** 2, axis=-1))
-
+        indices = np.indices(self.map_size)
+        dists = np.sqrt(np.sum((indices - np.array(bmu_idx)[:, np.newaxis, np.newaxis]) ** 2, axis=0))
+    
         # Compute the neighborhood function
         h = np.exp(-(dists ** 2) / (2 * r ** 2))
-
+    
         # Compute the delta for updating the weights
         delta = lr * h[..., np.newaxis] * (x - self.weights)
-
+    
         # Update the weights using element-wise addition
         self.weights += delta
 
     def calculate_umatrix(self):
         # Initialize the U-Matrix array with zeros
-        umatrix = np.zeros((self.map_size[0] * 2 - 1, self.map_size[1] * 2 - 1))
+        umatrix = np.zeros((2 * self.map_size[0] - 1, 2 * self.map_size[1] - 1))
 
         # Iterate over each neuron in the SOM
         for i in range(self.map_size[0]):
@@ -97,14 +96,6 @@ class SOM:
 
             # Assign the data point to the cluster of the BMU
                 labels.append(bmu_idx)
-        '''labels = []
-        num_clusters = 12  # Number of clusters
-    
-        for i, x in enumerate(data):
-            cluster_label = i % num_clusters +1 # Assign a cluster label in a cyclic manner
-            labels.append(cluster_label)
-    
-        '''
 
         return labels
 
