@@ -7,8 +7,8 @@ from SOM import SOM
 from sklearn.decomposition import PCA
 from sklearn.model_selection import train_test_split, ParameterGrid
 from bokeh.layouts import row, column
-from bokeh.models import Select
-from bokeh.plotting import figure, show
+from bokeh.plotting import curdoc, figure
+from main import generate_bokeh_plots
 
 def convert_to_base(number_list, map_size):
     converted_numbers = []
@@ -41,7 +41,6 @@ def preprocess_documents(documents):
 
     return preprocessed_docs
 
-
 def generate_cluster_labels(filename):
     # Read the Excel file and extract the documents
     df = pd.read_excel(filename, sheet_name='Sheet')
@@ -71,105 +70,61 @@ def generate_cluster_labels(filename):
         'num_epochs': [1, 10, 20, 50, 100]
     }
 
-    best_nmi = 0.0
-    best_map_size = None
-    best_num_epochs = None
+    results = {}
 
-    nmi_values = []
-    ari_values = []
-    silhouette_values = []
+    for map_size in param_grid['map_size']:
+        nmi_values = []
+        ari_values = []
+        silhouette_values = []
+        quantization_errors = []
+        topographic_errors = []
 
-    for params in ParameterGrid(param_grid):
-        map_size = params['map_size']
-        num_epochs = params['num_epochs']
+        for num_epochs in param_grid['num_epochs']:
+            # Train the SOM on the document vectors
+            som.__init__(input_dim, map_size)
+            som.train(docs_vector, num_epochs)
 
-        # Train the SOM on the document vectors
-        som.__init__(input_dim, map_size)
-        som.train(docs_vector, num_epochs)
+            u_matrix = som.get_u_matrix()
 
-        u_matrix = som.get_u_matrix()
+            # Preprocess the test documents
+            docs_test = preprocess_documents(docs_test)
 
-        # Preprocess the test documents
-        docs_test = preprocess_documents(docs_test)
+            # Convert test documents to TF-IDF vectors
+            test_tfidf_vectors = vectorizer.transform(docs_test).toarray()
+            test_docs_vector = pca.transform(test_tfidf_vectors)
 
-        # Convert test documents to TF-IDF vectors
-        test_tfidf_vectors = vectorizer.transform(docs_test).toarray()
-        test_docs_vector = pca.transform(test_tfidf_vectors)
+            # Cluster the test documents using the trained SOM
+            cluster_labels = som.cluster(test_docs_vector)
+            cluster_labels = convert_to_base(cluster_labels, map_size)
 
-        # Cluster the test documents using the trained SOM
-        cluster_labels = som.cluster(test_docs_vector)
-        cluster_labels = convert_to_base(cluster_labels, map_size)
+            # Calculate the evaluation metrics
+            silhouette_coefficient = silhouette_score(test_docs_vector, cluster_labels)
+            nmi = normalized_mutual_info_score(docs_test, cluster_labels)
+            ari = adjusted_rand_score(docs_test, cluster_labels)
 
-        # Calculate the evaluation metrics
-        silhouette_coefficient = silhouette_score(test_docs_vector, cluster_labels)
-        nmi = normalized_mutual_info_score(docs_test, cluster_labels)
-        ari = adjusted_rand_score(docs_test, cluster_labels)
+            # Calculate quantization error and topographic error
+            quantization_err = som.quantization_error(test_docs_vector)
+            topographic_err = som.topographic_error(test_docs_vector)
 
-        # Append the evaluation metric values
-        nmi_values.append(nmi)
-        ari_values.append(ari)
-        silhouette_values.append(silhouette_coefficient)
+            # Append the evaluation metric values
+            nmi_values.append(nmi)
+            ari_values.append(ari)
+            silhouette_values.append(silhouette_coefficient)
+            quantization_errors.append(quantization_err)
+            topographic_errors.append(topographic_err)
 
-        # Print evaluation metrics for each parameter combination
-        print(f"Map Size: {map_size}, Num Epochs: {num_epochs}")
-        print(f"Silhouette Coefficient: {silhouette_coefficient}")
-        print(f"NMI: {nmi}")
-        print(f"ARI: {ari}")
-        print("")
+        # Save the evaluation metric values for the map size
+        results[map_size] = {
+            'nmi_values': nmi_values,
+            'ari_values': ari_values,
+            'silhouette_values': silhouette_values,
+            'quantization_errors': quantization_errors,
+            'topographic_errors': topographic_errors
+        }
 
-        # Update best parameters if NMI is higher
-        if nmi > best_nmi:
-            best_nmi = nmi
-            best_map_size = map_size
-            best_num_epochs = num_epochs
+    generate_bokeh_plots(param_grid['num_epochs'], results)
 
-    print(f"Best Map Size: {best_map_size}")
-    print(f"Best Num Epochs: {best_num_epochs}")
-    print(f"Best NMI: {best_nmi}")
+    return test_docs_vector , cluster_labels
 
-    generate_bokeh_plots(param_grid['num_epochs'], nmi_values, ari_values, silhouette_values, best_map_size,
-                         best_num_epochs)
-
-
-    return test_docs_vector, cluster_labels, u_matrix
-
-def generate_bokeh_plots(num_epochs, nmi_values, ari_values, silhouette_values, best_map_size, best_num_epochs):
-    # Generate Bokeh plot for NMI
-    p_nmi = figure(title='NMI', x_axis_label='num_epochs', y_axis_label='NMI')
-    p_nmi.line(num_epochs, nmi_values, color="blue", alpha=0.3)
-
-    # Create select menus for map size and num_epochs
-    map_size_select = Select(title="Map Size:", value=str(best_map_size),
-                             options=[str(x) for x in param_grid['map_size']])
-    num_epochs_select = Select(title="Num Epochs:", value=str(best_num_epochs),
-                               options=[str(x) for x in param_grid['num_epochs']])
-
-    # Define update_selections function
-    def update_selections(attr, old, new):
-        map_size = tuple(map(int, map_size_select.value.split(',')))
-        num_epochs = int(num_epochs_select.value)
-
-        # Update SOM with selected parameters
-        SOM.__init__(input_dim, map_size)
-        SOM.train(docs_vector, num_epochs)
-
-        # Update NMI values
-        cluster_labels = som.cluster(test_docs_vector)
-        cluster_labels = convert_to_base(cluster_labels, map_size)
-        nmi = normalized_mutual_info_score(docs_test, cluster_labels)
-        nmi_values[param_grid['num_epochs'].index(num_epochs)] = nmi
-
-        # Update NMI plot
-        p_nmi.line(num_epochs, nmi_values, color="blue", alpha=0.3)
-
-    # Attach update_selections function to the select menus' on_change event
-    map_size_select.on_change('value', update_selections)
-    num_epochs_select.on_change('value', update_selections)
-
-    # Create layout
-    layout = column(row(map_size_select, num_epochs_select), p_nmi)
-
-    # Show the Bokeh plot
-    show(layout)
 
 

@@ -40,7 +40,7 @@ class SOM:
     
         # Compute the distance between each neuron and the BMU
         indices = np.indices(self.map_size)
-        dists = np.sqrt(np.sum((indices - np.array(bmu_idx)[:, np.newaxis, np.newaxis]) ** 2, axis=0))
+        dists = np.sum(np.abs(indices - np.array(bmu_idx)[:, np.newaxis, np.newaxis]), axis=0)
     
         # Compute the neighborhood function
         h = np.exp(-(dists ** 2) / (2 * r ** 2))
@@ -86,6 +86,47 @@ class SOM:
         
     def get_u_matrix(self):
         return self.umatrix    
+
+    def quantization_error(self, data):
+        total_error = 0.0
+
+        for x in data:
+            bmu, _ = self.find_bmu(x)
+            error = np.linalg.norm(x - bmu)
+            total_error += error
+
+        mean_error = total_error / len(data)
+        return mean_error
+    
+    def topographic_error(self, data):
+        total_error = 0
+
+        for x in data:
+            bmu, bmu_idx = self.find_bmu(x)
+            neighbors = self.find_neighbors(bmu_idx)
+
+            if not any(np.array_equal(bmu_idx, neighbor) for neighbor in neighbors):
+                total_error += 1
+
+        error_rate = total_error / len(data)
+        return error_rate
+    
+    
+    def find_neighbors(self, idx):
+        neighbors = []
+        i, j = idx
+
+        if i > 0:
+            neighbors.append((i - 1, j))
+        if i < self.map_size[0] - 1:
+            neighbors.append((i + 1, j))
+        if j > 0:
+            neighbors.append((i, j - 1))
+        if j < self.map_size[1] - 1:
+            neighbors.append((i, j + 1))
+
+        return neighbors
+
 
     def cluster(self, data):
         labels = []

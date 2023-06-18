@@ -3,6 +3,6 @@ from funtions import generate_cluster_labels
 
 
 
-output_file,v,x = generate_cluster_labels('Data.xlsx')
+generate_cluster_labels('data1.xlsx')
 
 #print("Output file:", output_file)

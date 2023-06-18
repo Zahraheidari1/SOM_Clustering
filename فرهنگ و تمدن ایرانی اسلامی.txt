@@ -49,4 +49,16 @@
 ايجاد اين موسسه يكي از بهترين راههاي نزديك كردن عواطف و پيوند
 ملتهاي اسلامي به ويژه اعضاي سازمان همكاري اقتصادي است.
 
+File 'funtions.py', line 121, in generate_bokeh_plots:
+map_size_select = Select(title="Map Size:", value=str(results.keys()[0]), Traceback (most recent call last):
+  File "C:\Users\Zahra\Anaconda3\lib\site-packages\bokeh\application\handlers\code_runner.py", line 231, in run
+    exec(self._code, module.__dict__)
+  File "C:\Users\Zahra\Desktop\pro\SOM_Clustering\run.py", line 6, in <module>
+    output_file,v,x = generate_cluster_labels('Data.xlsx')
+  File "C:\Users\Zahra\Desktop\pro\SOM_Clustering\funtions.py", line 116, in generate_cluster_labels
+    generate_bokeh_plots(param_grid['num_epochs'], results)
+  File "C:\Users\Zahra\Desktop\pro\SOM_Clustering\funtions.py", line 121, in generate_bokeh_plots
+    map_size_select = Select(title="Map Size:", value=str(results.keys()[0]),
+TypeError: 'dict_keys' object is not subscriptable
+
 0.16177867093634204
