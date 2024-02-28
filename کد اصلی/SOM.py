@@ -28,7 +28,6 @@ class SOM:
     def update_weights(self, x, bmu, bmu_idx, epoch, num_epochs):
         
         lr = 1.0 - (epoch / float(num_epochs))
-        #radius of the neighborhood around
         r = self.map_size[0] / 2.0 * lr
     
         indices = np.indices(self.map_size)

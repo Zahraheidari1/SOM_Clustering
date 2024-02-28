@@ -1,8 +1,8 @@
 
-from funtions import generate_cluster_labels
+from functions import run_multiple
 
 
 
-generate_cluster_labels('data1.xlsx')
+run_multiple(2,10,'data1.xlsx',1)
 
 #print("Output file:", output_file)

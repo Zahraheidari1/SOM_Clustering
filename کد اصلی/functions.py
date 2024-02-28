@@ -179,6 +179,7 @@ def clustering(train,test,cluster=10,epochs=50):
     map_size = get_mapsize(cluster)
     # Create SOM instance
     input_dim = train.shape[1]
+
     som = SOM(input_dim, map_size)  
     som.train(train, 50)
 
