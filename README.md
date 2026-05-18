@@ -212,9 +212,9 @@ You can add screenshots in this section.
 
 Example:
 
-```markdown
+
 ![Demo](demo.gif)
-```
+
 
 ---
 
