@@ -213,7 +213,9 @@ You can add screenshots in this section.
 Example:
 
 
-![Demo](demo.gif)
+<p align="center">
+  <img src="demo.gif" width="700"/>
+</p>
 
 
 ---
