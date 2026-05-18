@@ -213,7 +213,7 @@ You can add screenshots in this section.
 Example:
 
 ```markdown
-[![SOM Visualization](images/som_result.png)](https://chatgpt.com/c/6a0424c2-c14c-832b-b680-61da53a55b7f)
+![Demo](demo.gif)
 ```
 
 ---
